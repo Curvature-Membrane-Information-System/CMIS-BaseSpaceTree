@@ -1,202 +1,123 @@
 ﻿#include <iostream>
 #include <vector>
-#include <opencv2/opencv.h>
+#include <opencv2/opencv.hpp>
 
 // 四叉树数据结构 
 // 用来存储地图图片区块以及对应的地图范围
-// 能够根据范围获取地图图片
+// 每个区块大小为 256 * 256
+// 能够根据范围获取地图图片区块
+// 加载图片均为实际 2048 * 2048 大小
+// 用于实现地图的缩放
+// 遍历./map/目录下的所有图片
+// 1_1.png 为(1,1)区块的图片
+// 1_2.png 为(1,2)区块的图片
+// 2_1.png 为(2,1)区块的图片
+// 2_2.png 为(2,2)区块的图片
+// 以此类推
 
 class QuadTree
 {
 public:
-    QuadTree(int x, int y, int width, int height)
+    QuadTree() {}
+    QuadTree(int x, int y, int width, int height, int level, int maxLevel)
     {
-        m_x = x;
-        m_y = y;
-        m_width = width;
-        m_height = height;
+        this->x = x;
+        this->y = y;
+        this->width = width;
+        this->height = height;
+        this->level = level;
+        this->maxLevel = maxLevel;
     }
 
-    void AddChild(QuadTree* child)
+    // 加载图片
+    void load(std::string path)
     {
-        m_children.push_back(child);
-    }
-
-    QuadTree* GetChild(int index)
-    {
-        if (index >= m_children.size()) return nullptr;
-        return m_children[index];
-    }
-
-    int GetX()
-    {
-        return m_x;
-    }
-
-    int GetY()
-    {
-        return m_y;
-    }
-
-    int GetWidth()
-    {
-        return m_width;
-    }
-
-    int GetHeight()
-    {
-        return m_height;
-    }
-
-private:
-    int m_x;
-    int m_y;
-    int m_width;
-    int m_height;
-    std::vector<QuadTree*> m_children;
-};
-
-// 地图图片区块
-
-class MapBlock
-{
-public:
-    MapBlock(int x, int y, int width, int height)
-    {
-        m_x = x;
-        m_y = y;
-        m_width = width;
-        m_height = height;
-    }
-
-    int GetX()
-    {
-        return m_x;
-    }
-
-    int GetY()
-    {
-        return m_y;
-    }
-
-    int GetWidth()
-    {
-        return m_width;
-    }
-
-    int GetHeight()
-    {
-        return m_height;
-    }
-
-private:
-    int m_x;
-    int m_y;
-    int m_width;
-    int m_height;
-};
-
-// 地图图片区块管理器
-
-class MapBlockManager
-{
-public:
-    MapBlockManager()
-    {
-        m_mapBlockTree = new QuadTree(0, 0, 1000, 1000);
-    }
-
-    ~MapBlockManager()
-    {
-        delete m_mapBlockTree;
-    }
-
-    void AddMapBlock(MapBlock* mapBlock)
-    {
-        m_mapBlocks.push_back(mapBlock);
-    }
-
-    void BuildMapBlockTree()
-    {
-        for (int i = 0; i < m_mapBlocks.size(); i++)
+        // 遍历目录下的所有图片
+        cv::glob(path, files, false);
+        for (int i = 0; i < files.size(); i++)
         {
-            MapBlock* mapBlock = m_mapBlocks[i];
-            QuadTree* quadTree = m_mapBlockTree;
-            while (true)
-            {
-                int x = quadTree->GetX();
-                int y = quadTree->GetY();
-                int width = quadTree->GetWidth();
-                int height = quadTree->GetHeight();
-                int mapBlockX = mapBlock->GetX();
-                int mapBlockY = mapBlock->GetY();
-                int mapBlockWidth = mapBlock->GetWidth();
-                int mapBlockHeight = mapBlock->GetHeight();
-                if (mapBlockX >= x && mapBlockX + mapBlockWidth <= x + width && mapBlockY >= y && mapBlockY + mapBlockHeight <= y + height)
-                {
-                    if (quadTree->GetChild(0) == NULL)
-                    {
-                        quadTree->AddChild(new QuadTree(x, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x, y + height / 2, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y + height / 2, width / 2, height / 2));
-                    }
-                    quadTree = quadTree->GetChild(0);
-                }
-                else if (mapBlockX >= x + width / 2 && mapBlockX + mapBlockWidth <= x + width && mapBlockY >= y && mapBlockY + mapBlockHeight <= y + height)
-                {
-                    if (quadTree->GetChild(1) == NULL)
-                    {
-                        quadTree->AddChild(new QuadTree(x, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x, y + height / 2, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y + height / 2, width / 2, height / 2));
-                    }
-                    quadTree = quadTree->GetChild(1);
-                }
-                else if (mapBlockX >= x && mapBlockX + mapBlockWidth <= x + width && mapBlockY >= y + height / 2 && mapBlockY + mapBlockHeight <= y + height)
-                {
-                    if (quadTree->GetChild(2) == NULL)
-                    {
-                        quadTree->AddChild(new QuadTree(x, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x, y + height / 2, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y + height / 2, width / 2, height / 2));
-                    }
-                    quadTree = quadTree->GetChild(2);
-                }
-                else if (mapBlockX >= x + width / 2 && mapBlockX + mapBlockWidth <= x + width && mapBlockY >= y + height / 2 && mapBlockY + mapBlockHeight <= y + height)
-                {
-                    if (quadTree->GetChild(3) == NULL)
-                    {
-                        quadTree->AddChild(new QuadTree(x, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x, y + height / 2, width / 2, height / 2));
-                        quadTree->AddChild(new QuadTree(x + width / 2, y + height / 2, width / 2, height / 2));
-                    }
-                    quadTree = quadTree->GetChild(3);
-                }
-                else
-                {
-                    break;
-                }
-            }
+            // 获取图片名
+            std::string name = files[i].substr(files[i].find_last_of("\\") + 1);
+            // 获取图片区块坐标
+            int x = std::stoi(name.substr(0, name.find("_")));
+            int y = std::stoi(name.substr(name.find("_") + 1, name.find(".")));
+            // 加载图片
+            cv::Mat img = cv::imread(files[i]);
+            // 存储图片
+            images.push_back(img);
+            // 存储图片区块坐标
+            positions.push_back(cv::Point(x, y));
         }
     }
 
+    // 获取图片
+    cv::Mat get(int x, int y, int width, int height)
+    {
+        // 获取图片区块坐标
+        int x1 = x / 256;
+        int y1 = y / 256;
+        int x2 = (x + width) / 256;
+        int y2 = (y + height) / 256;
+        // 获取图片区块
+        cv::Mat img1 = get(x1, y1);
+        cv::Mat img2 = get(x2, y1);
+        cv::Mat img3 = get(x1, y2);
+        cv::Mat img4 = get(x2, y2);
+        // 拼接图片
+        cv::Mat img;
+        cv::hconcat(img1, img2, img);
+        cv::Mat img_;
+        cv::hconcat(img3, img4, img_);
+        cv::vconcat(img, img_, img);
+        // 返回图片
+        return img;
+    }
+
+    // 获取图片
+    cv::Mat get(int x, int y)
+    {
+        // 获取图片区块
+        cv::Mat img = cv::Mat;
+        for (int i = 0; i < positions.size(); i++)
+        {
+            if (positions[i].x == x && positions[i].y == y)
+            {
+                img = images[i];
+                break;
+            }
+        }
+        // 返回图片
+        return img;
+    }
+
 private:
-    std::vector<MapBlock*> m_mapBlocks;
-    QuadTree* m_mapBlockTree;
+    // 图片区块坐标
+    int x;
+    int y;
+    // 图片区块大小
+    int width;
+    int height;
+    // 图片区块层级
+    int level;
+    // 图片区块最大层级
+    int maxLevel;
+    // 图片区块
+    std::vector<cv::Mat> images;
+    // 图片区块坐标
+    std::vector<cv::Point> positions;
+    // 图片路径
+    std::vector<std::string> files;
 };
 
 int main()
 {
-    MapBlockManager mapBlockManager;
-    mapBlockManager.AddMapBlock(new MapBlock(0, 0, 100, 100));
-    mapBlockManager.AddMapBlock(new MapBlock(0, 100, 100, 100));
-    mapBlockManager.AddMapBlock(new MapBlock(100, 0, 100, 100));
-    mapBlockManager.AddMapBlock(new MapBlock(100, 100, 100, 100));
-    mapBlockManager.BuildMapBlockTree();
+    // 加载图片
+    QuadTree tree;
+    tree.load("./map/*.png");
+    // 获取图片
+    cv::Mat img = tree.get(0, 0, 2048, 2048);
+    // 显示图片
+    cv::imshow("img", img);
+    cv::waitKey(0);
     return 0;
 }
-
