@@ -105,6 +105,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\opencv\opencv_460\install\build_Shared_World_NoCuda\install\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,6 +125,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\opencv\opencv_460\install\build_Shared_World_NoCuda\install\include</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,8 +139,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="TEST.cpp" />
+    <ClCompile Include="test_1st.cpp" />
+    <ClCompile Include="test_2nd.cpp" />
+    <ClCompile Include="test_3rd.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="test_1st.h" />
+    <ClInclude Include="2nd.box.h" />
+    <ClInclude Include="test_2nd.h" />
+    <ClInclude Include="2nd.point.h" />
+    <ClInclude Include="test_3rd.h" />
     <ClInclude Include="元.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

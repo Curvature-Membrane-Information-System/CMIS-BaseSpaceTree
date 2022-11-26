@@ -18,9 +18,33 @@
     <ClCompile Include="TEST.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="test_1st.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="test_2nd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="test_3rd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="元.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="test_1st.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="test_2nd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="2nd.point.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="2nd.box.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="test_3rd.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
