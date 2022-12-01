@@ -92,9 +92,11 @@ void QuadTree::loadMap()
         // 图片大小归一化 2048 * 2048
         if (img.cols != 2048 || img.rows != 2048)
         {
-            // 为了防止边缘出现淡化现象，放大时使用 INTER_CUBIC 插值
-            cv::resize(img, img, cv::Size(2048, 2048), 0, 0, cv::INTER_CUBIC);
-            //TODO: 插值算法需要优化
+            // 为了防止边缘出现淡化现象，放大时使用 INTER_NEAREST 插值
+			if (img.cols > 512 || img.rows > 512)
+				cv::resize(img, img, cv::Size(2048, 2048), 0, 0, cv::INTER_NEAREST);
+			else
+				cv::resize(img, img, cv::Size(2048, 2048), 0, 0, cv::INTER_CUBIC);
         }
         // 存储图片
         m_map.push_back(img);
